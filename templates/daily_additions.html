@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Additions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .chart-container {
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+        .bar {
+            width: 50px;
+            background-color: #4CAF50;
+            text-align: center;
+            color: white;
+            margin: 0 5px;
+        }
+        .bar span {
+            display: block;
+            padding: 5px 0;
+            background: #4CAF50;
+        }
+        .y-axis {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: absolute;
+            height: 100%;
+            left: -50px;
+            padding: 10px 0;
+        }
+        .y-axis div {
+            display: flex;
+            justify-content: flex-end;
+            height: 20px;
+        }
+        .x-axis {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .x-axis div {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product Daily Additions</h1>
+        <div class="chart-container">
+            <div class="y-axis">
+                <div>25</div>
+                <div>20</div>
+                <div>15</div>
+                <div>10</div>
+                <div>5</div>
+                <div>0</div>
+            </div>
+            <div class="bars">
+                {% for count in counts %}
+                    <div class="bar" style="height: {{ count }}px;">
+                        <span>{{ count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="x-axis">
+            {% for date in dates %}
+                <div>{{ date }}</div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

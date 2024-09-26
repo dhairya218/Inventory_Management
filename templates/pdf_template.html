@@ -1,0 +1,397 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%; /* Ensure it takes full width */
+            white-space: nowrap; /* Prevent wrapping */
+        }
+        .company-name {
+            flex: none; /* Prevent flex grow/shrink */
+            text-align: left; /* Align left for company name */
+        }
+        .company-heading {
+            flex-grow: 1; /* Allow this to grow and center */
+            text-align: left; /* Center the heading */
+        }
+        .current-date {
+            flex: none; /* Prevent flex grow/shrink */
+            text-align: right; /* Align right for date */
+        }
+        h1, h2 {
+            margin: 0;
+            font-size: 1.2em; /* Adjust size for better fit */
+        }
+    </style>
+
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">
+            <h2>{{ company_name }}</h2>
+        </div>
+        <div class="company-heading">
+            <h1>{{ company_heading }}</h1>
+        </div>
+        <div class="current-date">
+            <p>Date: {{ current_date }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                {% if 'product_id' in selected_columns %}
+                    <th>Product ID</th>
+                {% endif %}
+                {% if 'product_name' in selected_columns %}
+                    <th>Product Name</th>
+                {% endif %}
+                {% if 'type' in selected_columns %}
+                    <th>Type</th>
+                {% endif %}
+                {% if 'created_at' in selected_columns %}
+                    <th>Created At</th>
+                {% endif %}
+                {% if 'quantity' in selected_columns %}
+                    <th>Quantity</th>
+                {% endif %}
+                {% if 'unit' in selected_columns %}
+                    <th>Unit</th>
+                {% endif %}
+                {% if 'transaction_type' in selected_columns %}
+                    <th>Transaction Type</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for history in history_list %}
+                <tr>
+                    {% if 'product_id' in selected_columns %}
+                        <td>{{ history.product.product_id }}</td>
+                    {% endif %}
+                    {% if 'product_name' in selected_columns %}
+                        <td>{{ history.product.product_name }}</td>
+                    {% endif %}
+                    {% if 'type' in selected_columns %}
+                        <td>{{ history.product.product_type }}</td>
+                    {% endif %}
+                    {% if 'created_at' in selected_columns %}
+                        <td>{{ history.created_at }}</td>
+                    {% endif %}
+                    {% if 'quantity' in selected_columns %}
+                        <td>{{ history.quantity }}</td>
+                    {% endif %}
+                    {% if 'unit' in selected_columns %}
+                        <td>{{ history.product.unit }}</td>
+                    {% endif %}
+                    {% if 'transaction_type' in selected_columns %}
+                        <td>
+                            {% if history.transaction_type == 'buy' %}
+                                Purchased
+                            {% elif history.transaction_type == 'sell' %}
+                                Sold
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .company-name, .company-heading, .current-date {
+            flex: none;
+            margin: 0;
+            text-align: left;
+        }
+        .company-heading {
+            flex-grow: 1;
+            text-align: left;
+        }
+        h1, h2 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .company-logo img {
+            max-width: 10px; 
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="company-logo">
+            <img src="{{ company_image }}" alt="Company Logo">
+        </div>
+
+        <div class="company-name">
+            <h2>{{ company_name }}</h2>
+        </div>
+
+        <div class="company-heading">
+            <h1>{{ company_heading }}</h1>
+        </div>
+
+        <div class="current-date">
+            <p>Date: {{ current_date }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                {% if 'product_id' in selected_columns %}
+                    <th>Product ID</th>
+                {% endif %}
+                {% if 'product_name' in selected_columns %}
+                    <th>Product Name</th>
+                {% endif %}
+                {% if 'type' in selected_columns %}
+                    <th>Type</th>
+                {% endif %}
+                {% if 'created_at' in selected_columns %}
+                    <th>Created At</th>
+                {% endif %}
+                {% if 'quantity' in selected_columns %}
+                    <th>Quantity</th>
+                {% endif %}
+                {% if 'unit' in selected_columns %}
+                    <th>Unit</th>
+                {% endif %}
+                {% if 'transaction_type' in selected_columns %}
+                    <th>Transaction Type</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for history in history_list %}
+                <tr>
+                    {% if 'product_id' in selected_columns %}
+                        <td>{{ history.product.product_id }}</td>
+                    {% endif %}
+                    {% if 'product_name' in selected_columns %}
+                        <td>{{ history.product.product_name }}</td>
+                    {% endif %}
+                    {% if 'type' in selected_columns %}
+                        <td>{{ history.product.product_type }}</td>
+                    {% endif %}
+                    {% if 'created_at' in selected_columns %}
+                        <td>{{ history.created_at }}</td>
+                    {% endif %}
+                    {% if 'quantity' in selected_columns %}
+                        <td>{{ history.quantity }}</td>
+                    {% endif %}
+                    {% if 'unit' in selected_columns %}
+                        <td>{{ history.product.unit }}</td>
+                    {% endif %}
+                    {% if 'transaction_type' in selected_columns %}
+                        <td>
+                            {% if history.transaction_type == 'buy' %}
+                                Purchased
+                            {% elif history.transaction_type == 'sell' %}
+                                Sold
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html> 
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ company_heading }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .company-name, .company-heading, .current-date {
+            flex: none;
+            margin: 0;
+        }
+        .company-heading {
+            flex-grow: 1;
+            text-align: center;
+        }
+        h1, h2 {
+            margin: 0;
+            font-size: 1.2em; /* Company name font size */
+        }
+        .company-logo img {
+            max-width: 1.2em; /* Adjust this value to match the font size */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        {% if company_image %}
+        <div class="company-logo">
+            <img src="{{ company_image }}" alt="Company Logo">
+        </div>
+        {% endif %}
+
+        {% if company_name %}
+        <div class="company-name">
+            <h2>{{ company_name }}</h2>
+        </div>
+        {% endif %}
+
+        <div class="company-heading">
+            <h1>{{ company_heading }}</h1>
+        </div>
+
+        <div class="current-date">
+            <p>Date: {{ current_date }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                {% if 'product_id' in selected_columns %}
+                    <th>Product ID</th>
+                {% endif %}
+                {% if 'product_name' in selected_columns %}
+                    <th>Product Name</th>
+                {% endif %}
+                {% if 'type' in selected_columns %}
+                    <th>Type</th>
+                {% endif %}
+                {% if 'created_at' in selected_columns %}
+                    <th>Created At</th>
+                {% endif %}
+                {% if 'quantity' in selected_columns %}
+                    <th>Quantity</th>
+                {% endif %}
+                {% if 'unit' in selected_columns %}
+                    <th>Unit</th>
+                {% endif %}
+                {% if 'transaction_type' in selected_columns %}
+                    <th>Transaction Type</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for history in history_list %}
+                <tr>
+                    {% if 'product_id' in selected_columns %}
+                        <td>{{ history.product.product_id }}</td>
+                    {% endif %}
+                    {% if 'product_name' in selected_columns %}
+                        <td>{{ history.product.product_name }}</td>
+                    {% endif %}
+                    {% if 'type' in selected_columns %}
+                        <td>{{ history.product.product_type }}</td>
+                    {% endif %}
+                    {% if 'created_at' in selected_columns %}
+                        <td>{{ history.created_at }}</td>
+                    {% endif %}
+                    {% if 'quantity' in selected_columns %}
+                        <td>{{ history.quantity }}</td>
+                    {% endif %}
+                    {% if 'unit' in selected_columns %}
+                        <td>{{ history.product.unit }}</td>
+                    {% endif %}
+                    {% if 'transaction_type' in selected_columns %}
+                        <td>
+                            {% if history.transaction_type == 'buy' %}
+                                Purchased
+                            {% elif history.transaction_type == 'sell' %}
+                                Sold
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html> -->

@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block content %}
+    <style>
+        .selected-columns-list {
+            margin-top: 10px;
+        }
+
+        .selected-columns-list .tag {
+            display: inline-block;
+            background-color: #007bff; /* Blue background */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .selected-columns-list .tag:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+    </style>
+
+    <div class="container mt-4">
+        <h1>Units List</h1>
+
+        <!-- Table for Displaying Units -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Unit Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for unit in units %}
+                <tr>
+                    <td>{{ unit.id }}</td>
+                    <td>{{ unit.unit_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+        <!-- Add Unit Button -->
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addUnitModal">Add Unit</button>
+
+        <!-- Edit Company Button -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCompanyModal"
+            data-company-name="{{ request.session.company_name|default_if_none:'' }}"
+            data-company-heading="{{ request.session.company_heading|default_if_none:'' }}"
+            data-selected-columns="{{ request.session.selected_columns|join:',' }}">
+            Edit Company
+        </button>
+        {% endif %}
+
+
+        <!-- Add Unit Modal -->
+        <div class="modal fade" id="addUnitModal" tabindex="-1" role="dialog" aria-labelledby="addUnitLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addUnitLabel">Add Unit</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'units' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="unit_name">Unit Name</label>
+                                <input type="text" name="unit_name" class="form-control" id="unit_name" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Unit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Company Modal -->
+        <div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog" aria-labelledby="addCompanyLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">Edit Company</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'add_company_and_pdf' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="company_name">Company Name</label>
+                                <input type="text" name="company_name" id="company_name" class="form-control"
+                                       placeholder="Enter company name"
+                                       value="{{ request.session.company_name|default_if_none:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="company_heading">Company Heading</label>
+                                <input type="text" name="company_heading" id="company_heading" class="form-control"
+                                       placeholder="Enter company heading"
+                                       value="{{ request.session.company_heading|default_if_none:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="company_image">Upload Company Image</label>
+                                <input type="file" name="company_image" class="form-control-file" id="company_image">
+                            </div>
+                            {% if request.session.company_logo %}
+                            <img src="{{ request.session.company_logo }}" alt="Company Logo" style="max-height: 100px;">
+                            {% endif %}
+                        
+
+                            <div class="form-group">
+                                <label for="selected_columns">Select Columns to Include in PDF</label>
+                                <select id="selected_columns" name="selected_columns" class="form-control" multiple>
+                                    <!-- <option value="company_name" {% if 'company_name' in request.session.selected_columns %}selected{% endif %}>Company Name</option>
+                                    <option value="company_image" {% if 'company_image' in request.session.selected_columns %}selected{% endif %}>Company Image</option> -->
+                                    <option value="product_id" {% if 'product_id' in request.session.selected_columns %}selected{% endif %}>Product ID</option>
+                                    <option value="product_name" {% if 'product_name' in request.session.selected_columns %}selected{% endif %}>Product Name</option>
+                                    <option value="created_at" {% if 'created_at' in request.session.selected_columns %}selected{% endif %}>Created at</option>
+                                    <option value="quantity" {% if 'quantity' in request.session.selected_columns %}selected{% endif %}>quantity</option>
+                                    <option value="unit" {% if 'unit' in request.session.selected_columns %}selected{% endif %}>unit</option>
+                                    <option value="transaction_type" {% if 'transaction_type' in request.session.selected_columns %}selected{% endif %}>Transaction Type</option>
+                                </select>
+                            </div>
+
+                            <div id="selected_columns_list" class="selected-columns-list"></div>
+
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            function updateSelectedColumnsDisplay() {
+                var selectedOptions = Array.from(document.getElementById('selected_columns').selectedOptions).map(option => option.text);
+                var selectedColumnsList = document.getElementById('selected_columns_list');
+
+                selectedColumnsList.innerHTML = '';
+
+                selectedOptions.forEach(function (column) {
+                    var span = document.createElement('span');
+                    span.classList.add('tag');
+                    span.textContent = column;
+                    selectedColumnsList.appendChild(span);
+                });
+            }
+
+            // Modal show event handler
+            $('#addCompanyModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var selectedColumns = button.data('selected-columns'); // Get selected columns from the button
+
+                if (selectedColumns) {
+                    selectedColumns = selectedColumns.split(','); // Split into an array
+
+                    // Clear all previous selections
+                    $('#selected_columns option').prop('selected', false);
+
+                    // Set selected options in the dropdown
+                    selectedColumns.forEach(function (column) {
+                        $('#selected_columns option[value="' + column + '"]').prop('selected', true);
+                    });
+
+                    // Update the displayed blue tags
+                    updateSelectedColumnsDisplay();
+                }
+            });
+
+            // Event listener to update the display when the selection changes
+            document.getElementById('selected_columns').addEventListener('change', updateSelectedColumnsDisplay);
+
+            // On page load, ensure the selected columns are displayed correctly
+            updateSelectedColumnsDisplay();
+        });
+    </script>
+{% endblock %}

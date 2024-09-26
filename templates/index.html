@@ -1,0 +1,517 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .card {
+            border-radius: 0.35rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .card-header {
+            background-color: #4e73df;
+            color: #ffffff;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 0.75rem;
+            border-radius: 0.35rem 0.35rem 0 0;
+        }
+
+        .card-footer {
+            background-color: #e3e6f0;
+            border-radius: 0 0 0.35rem 0.35rem;
+            padding: 0.75rem;
+        }
+
+        .text-uppercase {
+            text-transform: uppercase;
+        }
+
+        .text-gray-800 {
+            color: #5a5c69;
+        }
+
+        .border-left-primary {
+            border-left: 0.25rem solid #4e73df;
+        }
+
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a;
+        }
+
+        .border-left-info {
+            border-left: 0.25rem solid #36b9cc;
+        }
+
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e;
+        }
+
+        .modal-content {
+            border-radius: 0.35rem;
+        }
+
+        .modal-header {
+            background-color: #4e73df;
+            color: #ffffff;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e3e6f0;
+        }
+
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2653d4;
+        }
+
+        .card .fa {
+            font-size: 2rem;
+        }
+        .navbar {
+    background-color: #4c6ef5;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 70px;
+    position: fixed;
+    top: 0;
+    transition: top 0.3s; /* Smooth transition for hiding */
+    z-index: 1000; /* Ensure the navbar stays above other content */
+}
+
+/* Navbar hidden when scrolling */
+.navbar-hidden {
+    top: -70px; /* Move the navbar up */
+}
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+
+        }
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 111;
+        }
+        .nav-items {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-item {
+            cursor: pointer;
+        }
+        .nav-item:hover {
+            text-decoration: underline;
+        }
+
+        .my-card{
+            margin-top: 90px;
+        }
+
+        .card-continer{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-link">
+         
+        </div>
+        <div class="icon">
+
+        </div>
+    </nav>
+    
+    <div class="container-fluid my-card">
+        <div class="row">
+            <!-- Total Products Card -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total Products
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    <p>{{ total_products }}</p>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-box fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Card -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    <a href="#" data-toggle="modal" data-target="#lowStockModal" style="text-decoration: none; color: inherit;">
+                                        Low Stock
+                                    </a>
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    <p>{{ low_stock_count }}</p>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Modal -->
+            <div class="modal fade" id="lowStockModal" tabindex="-1" role="dialog" aria-labelledby="lowStockModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="lowStockModalLabel">Check Low Stock</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <!-- <form id="lowStockForm" method="get" action="{% url 'index' %}">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="stockThreshold">Enter Stock Threshold</label>
+                                    <input type="number" min="0" id="stockThreshold" name="stockThreshold" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Check Stock</button>
+                            </div>
+                        </form> -->
+                        <form method="POST" action="{% url 'index' %}">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="stockThreshold">Enter Stock Threshold</label>
+                                    <input type="number" min="0" id="stockThreshold" name="stockThreshold" class="form-control" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Buy Card -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Stock Buy
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_buys }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-cogs fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Sell Card -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Stock Sell
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_sells }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+            <div class="card-continer">
+            <div class="col-xl-5 col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <label for="daysDropdown">Select Days:</label>
+                            <select id="daysDropdown" onchange="updateChart()">
+                                <option value="1">1 Day</option>
+                                <option value="3">3 Days</option>
+                                <option value="5">5 Days</option>
+                                <option value="7">7 Days</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-area">
+                                <canvas id="myAreaChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4" >
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <h2 style="font-size: 25px; padding: 1px;">Stock Capacity</h2>
+                            <div class="pieChart-parent">
+                                <canvas id="pieChartCapacity" style="height: 320px; width: 320px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <h2 style="font-size: 25px; padding: 1px;">Low Stock</h2>
+                            <div class="pieChart-parent">
+                                <canvas id="lowStockChart" style="height: 324px; width: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <h2 style="font-size: 25px; padding: 1px;">Products by Type</h2>
+                            <div class="pieChart-parent">
+                                <canvas id="productTypeChart" style="height: 320px; width: 320px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Existing chart setup code...
+    
+            // Product Type Chart
+            var ctxProductType = document.getElementById('productTypeChart').getContext('2d');
+            var productTypeChart = new Chart(ctxProductType, {
+                type: 'polarArea',
+                data: {
+                    labels: {{ product_type_labels|safe }},
+                    datasets: [{
+                        label: 'Number of Products',
+                        data: {{ product_type_counts|safe }},
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctxPieChartCapacity = document.getElementById('pieChartCapacity').getContext('2d');
+        new Chart(ctxPieChartCapacity, {
+            type: 'pie',
+            data: {
+                labels: {{ pie_chart_labels|safe }},
+                datasets: [{
+                    data: {{ pie_chart_data|safe }},
+                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const ctxLowStock = document.getElementById('lowStockChart').getContext('2d');
+        new Chart(ctxLowStock, {
+            type: 'bar',
+            data: {
+                labels: {{ low_stock_labels|safe }},
+                datasets: [{
+                    label: 'Stock Quantity',
+                    data: {{ low_stock_data|safe }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'x',
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize Area Chart
+        var ctxArea = document.getElementById('myAreaChart').getContext('2d');
+        var myAreaChart = new Chart(ctxArea, {
+            type: 'line',
+            data: {
+                labels: {{ dates|safe }},
+                datasets: [
+                    {
+                        label: 'Buys',
+                        data: {{ buys|safe }},
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Sells',
+                        data: {{ sells|safe }},
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Initialize Pie Chart
+        var ctxPie = document.getElementById('pieChartCapacity').getContext('2d');
+        var myPieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: {{ pie_chart_labels|safe }},
+                datasets: [{
+                    data: {{ pie_chart_data|safe }},
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#E7E9ED', '#FF9F40', '#C9CBCF', '#D4A5A5']
+                }]
+            }
+        });
+
+        // Update chart based on selected days
+        function updateChart() {
+            var days = document.getElementById('daysDropdown').value;
+            window.location.href = '?stockThreshold=' + days;
+        }
+    </script>
+    <script>
+        document.getElementById('lowStockForm').addEventListener('submit', function() {
+            $('#lowStockModal').modal('hide');
+        });
+    </script>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const lowStockForm = document.getElementById('lowStockForm');
+            const stockThresholdInput = document.getElementById('stockThreshold');
+
+            lowStockForm.addEventListener('submit', function(event) {
+                event.preventDefault();  // Prevent traditional form submission
+
+                const stockThreshold = parseInt(stockThresholdInput.value);
+
+                if (!isNaN(stockThreshold) && stockThreshold >= 0) {
+                    // Update the URL with the new threshold and reload the page
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('stockThreshold', stockThreshold);
+                    window.location.href = url.toString();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}
+                   

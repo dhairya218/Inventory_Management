@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+/* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px; /* Add space below the table */
+}
+
+.table th, .table td {
+    padding: 10px;
+    text-align: left;
+    vertical-align: middle;
+    border: 1px solid #ddd; /* Merged the border from both tables */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+.table-bordered {
+    border: 1px solid #dee2e6;
+}
+
+/* Table Header Styling */
+.table th {
+    background-color: #f2f2f2; /* Added from second CSS */
+    color: #000;
+}
+
+.table .thead-dark th {
+    color: #fff;
+    background-color: #343a40;
+}
+
+/* Form and Button Styling */
+.form-inline .form-control {
+    margin-right: 10px;
+}
+
+.btn {
+    margin-right: 5px;
+}
+
+/* Placement for the "Back to Product List" Button */
+.d-flex.justify-content-between.mb-4 {
+    margin-bottom: 20px;
+}
+
+/* Additional Styling for Title */
+.table-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+
+</style>
+<div class="container mt-5">
+    <h1 style="text-align: center;">Product History</h1>
+    <div class="d-flex justify-content-between mb-4">
+        <!-- Back to Product List Button (moved to the top-right corner) -->
+        <a href="{% url 'product-history' %}" class="btn btn-secondary">Back to Product history</a>
+        
+        <!-- Search Form with Product Dropdown -->
+        <form method="get" action="" class="form-inline">
+            <!-- Product Dropdown -->
+            <select name="product_filter" class="form-control mr-sm-2" id="productDropdown">
+                <option value="">All Products</option>
+                {% for product in all_products %}
+                    <option value="{{ product.id }}" {% if selected_product_id == product.id %}selected{% endif %}>{{ product.product_name }}</option>
+                {% endfor %}
+            </select>
+            
+            <!-- Search by Product Name -->
+            <input type="text" name="search" class="form-control mr-sm-2" placeholder="Search by Product Name" value="{{ search_query }}">
+            
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+
+    <!-- Display success or error messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+    <!-- Download PDF Button -->
+    {% if history_list %}
+        <a href="{% url 'download-pdf' %}?product_filter={{ selected_product_id }}&search={{ search_query }}" class="btn btn-success mb-4">Download PDF</a>
+    {% else %}
+        <span class="text-muted">No records to download</span>
+    {% endif %}
+    {% endif %}
+
+
+    <!-- Product History Table -->
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th><a href="?{% if search_query %}search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}&sort_by=product_id{% if history_list.has_other_pages %}&page={{ history_list.number }}{% endif %}">Product ID</a></th>
+                <th><a>Product Name</a></th>
+                <th><a>Type</a></th>
+                <th><a href="?{% if search_query %}search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}&sort_by=created_at{% if history_list.has_other_pages %}&page={{ history_list.number }}{% endif %}">Created At</a></th>
+                <th><a href="?{% if search_query %}search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}&sort_by=quantity{% if history_list.has_other_pages %}&page={{ history_list.number }}{% endif %}">Product Quantity</a></th>
+                <th><a href="?{% if search_query %}search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}&sort_by=unit{% if history_list.has_other_pages %}&page={{ history_list.number }}{% endif %}">Unit</a></th>
+                <th><a href="?{% if search_query %}search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}&sort_by=transaction_type{% if history_list.has_other_pages %}&page={{ history_list.number }}{% endif %}">Stock Transaction</a></th>
+                {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+                <th>Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        
+        <tbody>
+            {% for history in history_list %}
+                <tr>
+                    <td>{{ history.product.product_id }}</td>
+                    <td>{{ history.product.product_name }}</td>
+                    <td>{{ history.product.product_type }}</td>
+                    <td>{{ history.created_at }}</td>
+                    <td>{{ history.quantity }}</td>
+                    <td>{{ history.product.unit }}</td>
+                    <td>
+                        {% if history.transaction_type == 'buy' %}
+                            Purchased
+                        {% elif history.transaction_type == 'sell' %}
+                            Sold
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </td>
+                    {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+                    <td>
+                            {% if history.product.is_active %}
+                                <!-- Edit Button triggers Modal -->
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editQuantityModal-{{ history.id }}">
+                                    Edit
+                                </button>
+                            {% else %}
+                                <!-- Button for inactive product -->
+                                <button type="button" class="btn btn-secondary" disabled>
+                                    Inactive
+                                </button>
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+
+                <!-- Edit Quantity Modal -->
+                <div class="modal fade" id="editQuantityModal-{{ history.id }}" tabindex="-1" role="dialog" aria-labelledby="editQuantityLabel-{{ history.id }}" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editQuantityLabel-{{ history.id }}">Edit Quantity</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="edit-quantity-form-{{ history.id }}" method="post" action="{% url 'edit-quantity' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ history.product.id }}"> <!-- Add the product_id field -->
+                                    <input type="hidden" name="history_id" value="{{ history.id }}">
+                                    <div class="form-group">
+                                        <label for="quantity-{{ history.id }}">Quantity</label>
+                                        <input type="number" class="form-control" name="quantity" id="quantity-{{ history.id }}" required min="0" step="any" value="{{ history.quantity }}">
+                                        <small class="form-text text-muted">Enter a positive float value.</small>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </form>
+                                
+                                <div id="error-message-{{ history.id }}" class="mt-2 text-danger"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-end">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <!-- First Page Button -->
+                {% if history_list.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;&laquo;</span>
+                </li>
+                {% endif %}
+
+                <!-- Previous Page Button -->
+                {% if history_list.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ history_list.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+                {% endif %}
+
+                <!-- Page Numbers -->
+                {% for num in history_list.paginator.page_range %}
+                    {% if num > history_list.number|add:'-5' and num < history_list.number|add:'5' %}
+                    <li class="page-item {% if history_list.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next Page Button -->
+                {% if history_list.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ history_list.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+                {% endif %}
+
+                <!-- Last Page Button -->
+                {% if history_list.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ history_list.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_product_id %}&product_filter={{ selected_product_id }}{% endif %}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;&raquo;</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Include Bootstrap CSS and JavaScript -->
+<script>
+    document.getElementById('productDropdown').addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{% endblock %}

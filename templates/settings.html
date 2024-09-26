@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Settings</h2>
+    <div class="settings-sections">
+
+        <!-- Profile Information Section -->
+        <div class="settings-section">
+            <h3>Profile Information</h3>
+            <p>Manage your personal information, including email, phone number, and username.</p>
+            <a href="{% url 'profile' %}" class="btn btn-primary">Edit Profile</a>
+        </div>
+
+        <!-- Display Section -->
+        <div class="settings-section">
+            <h3>Display</h3>
+            <p>Customize how content is displayed on your screen.</p>
+            <a href="#" class="btn btn-primary">Display Settings</a>
+        </div>
+
+        <!-- General Preferences Section -->
+        <div class="settings-section">
+            <h3>General Preferences</h3>
+            <div class="preference-item">
+                <label for="language">Language</label>
+                <select id="language" name="language" class="form-control">
+                    <option value="english">English</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                    <!-- Add more languages as needed -->
+                </select>
+            </div>
+            <div class="preference-item">
+                <label for="sound_effects">Sound Effects</label>
+                <input type="checkbox" id="sound_effects" name="sound_effects" class="form-check-input">
+                <label for="sound_effects" class="form-check-label">Enable sound effects</label>
+            </div>
+            <div class="preference-item">
+                <label for="feed_preference">Feed Preferences</label>
+                <select id="feed_preference" name="feed_preference" class="form-control">
+                    <option value="all">Show all posts</option>
+                    <option value="personalized">Personalized feed</option>
+                    <option value="none">No feed</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="settings-section">
+            <h3>Calendar</h3>
+            <p>Manage your calendar settings and preferences.</p>
+            <a href="#" class="btn btn-primary">Calendar Settings</a>
+        </div>
+
+        <!-- Change Password Section -->
+        <div class="settings-section">
+            <h3>Change Password</h3>
+            <p>Change your account password securely.</p>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePasswordModal">
+                Change Password
+            </button>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="changePasswordForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="oldPassword">Old Password</label>
+                        <input type="password" class="form-control" id="oldPassword" name="old_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="new_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmNewPassword" name="confirm_new_password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .container {
+        max-width: 800px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .settings-sections {
+        margin-top: 30px;
+    }
+
+    .settings-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .settings-section h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    .settings-section p {
+        font-size: 16px;
+        color: #666666;
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        border-radius: 5px;
+        padding: 8px 15px;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    .preference-item {
+        margin-bottom: 15px;
+    }
+
+    .preference-item label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #dddddd;
+        width: 100%;
+    }
+
+    .form-check-input {
+        margin-top: 0.3rem;
+        margin-left: 0;
+    }
+
+    .form-check-label {
+        margin-left: 10px;
+        font-size: 14px;
+    }
+</style>
+
+<!-- Custom JavaScript -->
+<script>
+    document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const oldPassword = document.getElementById('oldPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+        // Clear previous error messages
+        const errorMessages = document.querySelectorAll('.error-message');
+        errorMessages.forEach(msg => msg.remove());
+
+        if (newPassword !== confirmNewPassword) {
+            showError("New passwords do not match.");
+            return;
+        }
+
+        const formData = new FormData(this);
+
+        fetch("{% url 'change_password' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Password successfully changed.");
+                $('#changePasswordModal').modal('hide');
+            } else {
+                showError(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    function showError(message) {
+        const modalBody = document.querySelector('.modal-body');
+        const errorDiv = document.createElement('div');
+        errorDiv.classList.add('alert', 'alert-danger', 'error-message');
+        errorDiv.textContent = message;
+        modalBody.insertBefore(errorDiv, modalBody.firstChild);
+    }
+</script>
+
+{% endblock %}

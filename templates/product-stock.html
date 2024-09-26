@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Stock</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .low-stock {
+            background-color: #ffcccc;  /* Light red background */
+            color: #d9534f;  /* Red text color */
+        }
+
+        /* Ensure default table styling */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Highlight the sorted column */
+        .sorted-column {
+            background-color: #e6f7ff; /* Light blue background for sorted column */
+            color: #007bff; /* Blue text for sorted column */
+            font-weight: bold;
+        }
+
+        /* Sorting arrows styling */
+        .sort-arrow {
+            margin-left: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Sorting arrows default to invisible */
+        .sort-arrow::after {
+            content: '\00a0'; /* Non-breaking space to ensure alignment */
+        }
+
+        /* If column is sorted in ascending order, show up arrow */
+        .sorted-column[data-sort-order="asc"] .sort-arrow::after {
+            content: '▲';
+        }
+
+        /* If column is sorted in descending order, show down arrow */
+        .sorted-column[data-sort-order="desc"] .sort-arrow::after {
+            content: '▼';
+        }
+
+        .table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Product Stock</h1>
+
+        {% if messages %}
+        <div class="row">
+            <div class="col-md-12">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <form method="GET" action="{% url 'product-stock' %}" class="form-inline">
+                    <input type="text" name="q" class="form-control mr-2" placeholder="Search by Product Name" value="{{ request.GET.q }}">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                    <a href="{% url 'product-stock' %}" class="btn btn-secondary" style="margin-left: 25px;">Back to Product Stock</a>
+                </form>
+            </div>
+            
+            {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+            <div class="col-md-6 text-right">
+                <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addQuantityModal">
+                    Add Stock
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Stock Table -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="?sort_by=product_id&sort_order={% if sort_order == 'asc' and sort_by == 'product_id' %}desc{% else %}asc{% endif %}" class="{% if sort_by == 'product_id' %}sorted-column{% endif %}">
+                            Product ID
+                            <span class="sort-arrow">
+                                {% if sort_by == 'product_id' %}
+                                    {% if sort_order == 'asc' %}▲{% else %}▼{% endif %}
+                                {% endif %}
+                            </span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort_by=product_name&sort_order={% if sort_order == 'asc' and sort_by == 'product_name' %}desc{% else %}asc{% endif %}" class="{% if sort_by == 'product_name' %}sorted-column{% endif %}">
+                            Product Name
+                            <span class="sort-arrow">
+                                {% if sort_by == 'product_name' %}
+                                    {% if sort_order == 'asc' %}▲{% else %}▼{% endif %}
+                                {% endif %}
+                            </span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort_by=stock_quantity&sort_order={% if sort_order == 'asc' and sort_by == 'stock_quantity' %}desc{% else %}asc{% endif %}" class="{% if sort_by == 'stock_quantity' %}sorted-column{% endif %}">
+                            Stock Quantity
+                            <span class="sort-arrow">
+                                {% if sort_by == 'stock_quantity' %}
+                                    {% if sort_order == 'asc' %}▲{% else %}▼{% endif %}
+                                {% endif %}
+                            </span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort_by=unit&sort_order={% if sort_order == 'asc' and sort_by == 'unit' %}desc{% else %}asc{% endif %}" class="{% if sort_by == 'unit' %}sorted-column{% endif %}">
+                            Unit
+                            <span class="sort-arrow">
+                                {% if sort_by == 'unit' %}
+                                    {% if sort_order == 'asc' %}▲{% else %}▼{% endif %}
+                                {% endif %}
+                            </span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort_by=updated_at&sort_order={% if sort_order == 'asc' and sort_by == 'updated_at' %}desc{% else %}asc{% endif %}" class="{% if sort_by == 'updated_at' %}sorted-column{% endif %}">
+                            Updated At
+                            <span class="sort-arrow">
+                                {% if sort_by == 'updated_at' %}
+                                    {% if sort_order == 'asc' %}▲{% else %}▼{% endif %}
+                                {% endif %}
+                            </span>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr {% if stock.stock_quantity < low_stock_count %}style="background-color: #D0D0D0;"{% endif %}>
+                    <td>{{ stock.product.product_id }}</td>
+                    <td>{{ stock.product.product_name }}</td>
+                    <td>{{ stock.stock_quantity }}</td>
+                    <td>{{ stock.product.unit }}</td>
+                    <td>{{ stock.updated_at }}</td> <!-- Use updated_at from ProductStock -->
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No stock records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+
+        <!-- Pagination -->
+<!-- Pagination -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-end"> <!-- New wrapper div for right alignment -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if stocks.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1&sort_by={{ sort_by }}&sort_order={{ sort_order }}{% if query %}&q={{ query }}{% endif %}" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ stocks.previous_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}{% if query %}&q={{ query }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in stocks.paginator.page_range %}
+                    {% if stocks.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if stocks.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ stocks.next_page_number }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}{% if query %}&q={{ query }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ stocks.paginator.num_pages }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}{% if query %}&q={{ query }}{% endif %}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div> <!-- End of wrapper div -->
+    </div>
+</div>
+
+    
+
+<!-- Add Quantity Modal -->
+<div class="modal fade" id="addQuantityModal" tabindex="-1" role="dialog" aria-labelledby="addQuantityModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addQuantityModalLabel">Add Stock</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{% url 'product-stock' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="product_id">Product</label>
+                        <select id="product_id" name="product_id" class="form-control" onchange="updateProductId()">
+                            <option value="">Select a Product</option>
+                            {% for product in all_products %}
+                            {% if product.is_active %}
+                            <option value="{{ product.id }}" data-product-id="{{ product.product_id }}" data-product-name="{{ product.product_name }}">{{ product.product_name }}</option>
+                            {% endif %}
+                            {% endfor %}
+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected_product_id">Product ID</label>
+                        <input type="text" id="selected_product_id" name="selected_product_id" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" class="form-control" step="0.01" min="0" value="{{ form_data.quantity }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="transaction_type">Transaction Type</label>
+                        <select id="transaction_type" name="transaction_type" class="form-control">
+                            <option value="buy">Buy</option>
+                            <option value="sell">Sell</option>
+                        </select>
+                    </div>
+                    {% if error_message %}
+                    <div class="alert alert-danger">
+                        {{ error_message }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function updateProductId() {
+            // Get the selected product's option
+            const select = document.getElementById('product_id');
+            const selectedOption = select.options[select.selectedIndex];
+    
+            // Check if an option is selected
+            if (selectedOption.value) {
+                // Extract the product ID from the selected option
+                const productId = selectedOption.getAttribute('data-product-id');
+                const productName = selectedOption.getAttribute('data-product-name');
+    
+                // Update the Product ID field
+                document.getElementById('selected_product_id').value = productId;
+            } else {
+                // Clear the Product ID field if no product is selected
+                document.getElementById('selected_product_id').value = '';
+            }
+        }
+    </script>
+    
+    
+    
+</body>
+</html>
+{% endblock %}
+

@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<style>
+    .dropdown-wrapper select {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        appearance: none;
+        background-image: url('data:image/svg+xml;base64,YOUR_ARROW_SVG_DATA_HERE');
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1rem 1rem;
+    }
+
+    .dropdown-wrapper {
+        position: relative;
+    }
+
+    .dropdown-wrapper::after {
+        content: '\25BC'; 
+        font-size: 1rem;
+        position: absolute;
+        right: 10px;
+        top: 12px;
+        pointer-events: none;
+        color: #495057;
+    }
+
+</style>
+<body>
+    <div class="container mt-4">
+        <h1>Product List</h1>
+
+        <div class="row mb-3">
+            <!-- Search Form on the left -->
+            <div class="col-md-6">
+                <form method="GET" action="{% url 'product-list' %}" class="form-inline">
+                    <input type="text" name="q" class="form-control mr-2" placeholder="Search by Product Name" value="{{ request.GET.q }}">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                </form>
+            </div>
+            
+            <!-- Bulk Actions Dropdown and Add Product Button on the right -->
+            <div class="col-md-6 text-right">
+                <form method="POST" action="{% url 'product-list' %}" class="form-inline">
+                    {% csrf_token %}
+                    <a href="{% url 'product-list' %}" class="btn btn-secondary" style="margin-left: 25px;">Back to Product List</a>
+                    {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProductModal" style="margin-left: 25px;">
+                        Add Product
+                    </button>
+
+                    {% endif %}
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Product Modal -->
+        <!-- <div class="modal fade {% if modal_open %}show{% endif %}" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductLabel" aria-hidden="{% if not modal_open %}true{% else %}false{% endif %}" style="{% if modal_open %}display:block;{% endif %}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProductLabel">Add Product</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <form method="post" action="{% url 'product-list' %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                        
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </form>                        
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- <div class="modal fade {% if modal_open %}show{% endif %}" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductLabel" aria-hidden="{% if not modal_open %}true{% else %}false{% endif %}" style="{% if modal_open %}display:block;{% endif %}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProductLabel">Add Product</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+        
+                        <form method="post" action="{% url 'product-list' %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+        
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </form>                        
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        
+        <div class="modal fade {% if modal_open %}show{% endif %}" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductLabel" aria-hidden="{% if not modal_open %}true{% else %}false{% endif %}" style="{% if modal_open %}display:block;{% endif %}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProductLabel">Add Product</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+        
+                        <form method="post" action="{% url 'product-list' %}">
+                            {% csrf_token %}
+        
+                            <!-- Display form-wide errors (e.g., non-field errors) -->
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+        
+                            <div class="form-group">
+                                <label for="product_name">Product Name</label>
+                                {{ form.product_name }}
+                                
+                                <!-- Display errors specific to product_name -->
+                                {% if form.product_name.errors %}
+                                    <div class="alert alert-danger">
+                                        {{ form.product_name.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+        
+                            <div class="form-group">
+                                <label for="product_type">Product Type</label>
+                                {{ form.product_type }}
+                                
+                                <!-- Display errors specific to product_type -->
+                                {% if form.product_type.errors %}
+                                    <div class="alert alert-danger">
+                                        {{ form.product_type.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+        
+                            <div class="form-group">
+                                <label for="unit">Unit</label>
+                                <div class="dropdown-wrapper">
+                                    {{ form.unit }}
+                                </div>
+                                
+                                <!-- Display errors specific to unit -->
+                                {% if form.unit.errors %}
+                                    <div class="alert alert-danger">
+                                        {{ form.unit.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+        
+                            <div class="form-group">
+                                <label for="initial_quantity">Initial Quantity</label>
+                                {{ form.initial_quantity }}
+                                
+                                <!-- Display errors specific to initial_quantity -->
+                                {% if form.initial_quantity.errors %}
+                                    <div class="alert alert-danger">
+                                        {{ form.initial_quantity.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+        
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </form>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+
+                <!-- Product Table -->
+                <!-- Product Table -->
+                <form method="post" action="{% url 'product-list' %}">
+                    {% csrf_token %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>
+                                    <a href="{% url 'product-list' %}?sort_by=product_id&sort_order={% if sort_by == 'product_id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        Product ID {% if sort_by == 'product_id' %}{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="{% url 'product-list' %}?sort_by=product_name&sort_order={% if sort_by == 'product_name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        Product Name {% if sort_by == 'product_name' %}{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
+                                    </a>
+                                </th>
+                                <th>Created At</th>
+                                <th>
+                                    <a href="{% url 'product-list' %}?sort_by=unit&sort_order={% if sort_by == 'unit' and sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        Unit {% if sort_by == 'unit' %}{% if sort_order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
+                                    </a>
+                                </th>
+                                <th>Product Type</th>
+                                {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+                                <th>Status</th>
+                                {% endif %}
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in page_obj.object_list %}
+                            <tr>
+                                <td><input type="checkbox" name="product_ids" value="{{ product.id }}"></td>
+                                <td>{{ product.product_id }}</td>
+                                <td>{{ product.product_name }}</td>
+                                <td>{{ product.created_date }}</td> <!-- Display Created At -->
+                                <td>{{ product.unit.unit_name }}</td>
+                                <td>{{ product.product_type }}</td>
+                                {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+                                <td class="status">
+                                    {% if product.is_active %}
+                                        <button type="button" class="btn btn-warning btn-sm btn-toggle-status" data-product-id="{{ product.id }}" data-url="{% url 'toggle-product-status' product.id %}" data-status="deactivate">Deactivate</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-success btn-sm btn-toggle-status" data-product-id="{{ product.id }}" data-url="{% url 'toggle-product-status' product.id %}" data-status="activate">Activate</button>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No products found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if user.role == 'SuperAdmin' or user.role == 'Manager' or user.role == 'Admin' %}
+                    <button type="submit" name="action" value="delete" class="btn btn-danger">Delete Selected</button>
+                    {% endif %}
+
+                </form>
+
+        
+
+        <!-- Pagination Controls -->
+        <div class="d-flex justify-content-end">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <!-- First Page Button -->
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.sort_order %}&sort_order={{ request.GET.sort_order }}{% endif %}" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;&laquo;</span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Previous Page Button -->
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.sort_order %}&sort_order={{ request.GET.sort_order }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Page Number Buttons -->
+                    {% for i in page_obj.paginator.page_range %}
+                        {% if i == page_obj.number %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.sort_order %}&sort_order={{ request.GET.sort_order }}{% endif %}">{{ i }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Next Page Button -->
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.sort_order %}&sort_order={{ request.GET.sort_order }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Last Page Button -->
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.sort_order %}&sort_order={{ request.GET.sort_order }}{% endif %}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="modal fade" id="deactivateModal" tabindex="-1" aria-labelledby="deactivateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deactivateModalLabel">Confirm Deactivation</h5>
+                    <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to deactivate this product?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeactivateBtn">Deactivate</button>
+                </div>
+            </div>
+        </div>
+</div>
+
+<script>
+    let productToDeactivate = null;
+    
+    $(document).ready(function () {
+        // Handle status toggle button clicks
+        $('button.btn-toggle-status').click(function (event) {
+            event.preventDefault();
+            
+            const status = $(this).data('status');
+    
+            // Check if it's a deactivate action and show modal
+            if (status === 'deactivate') {
+                productToDeactivate = $(this);
+                $('#deactivateModal').modal('show');
+            } else {
+                toggleProductStatus($(this));
+            }
+        });
+    
+        // Confirm deactivate in modal
+        $('#confirmDeactivateBtn').click(function () {
+            if (productToDeactivate) {
+                toggleProductStatus(productToDeactivate);
+                $('#deactivateModal').modal('hide');
+            }
+        });
+    
+        // Function to handle status toggle via AJAX
+        function toggleProductStatus(button) {
+            const actionUrl = button.data('url');
+            const statusCell = button.closest('tr').find('.status');
+    
+            $.ajax({
+                url: actionUrl,
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    const isActive = response.is_active;
+    
+                    if (isActive) {
+                        button.text('Deactivate').removeClass('btn-success').addClass('btn-warning');
+                    } else {
+                        button.text('Activate').removeClass('btn-warning').addClass('btn-success');
+                    }
+                },
+                error: function () {
+                    alert('An error occurred while updating the product status.');
+                }
+            });
+        }
+    });
+    </script>
+</body>
+
+
+</html>
+{% endblock %}

@@ -1,0 +1,811 @@
+<!-- # class CompanyForm(forms.Form):
+#     company_name = forms.CharField(max_length=255, required=False)
+#     company_heading = forms.CharField(max_length=255, required=False)
+#     company_image = forms.ImageField(required=False)
+#     selected_columns = forms.MultipleChoiceField(
+#         choices=[
+#             ('company_name', 'Company Name'),
+#             ('company_image', 'Company Image'),
+#             ('product_id', 'Product ID'),
+#             ('product_name', 'Product Name'),
+#             ('product_type', 'Product Type'),
+#             ('created_at', 'Created Date'),
+#             ('quantity', 'Quantity'),
+#             ('unit', 'Unit'),
+#             ('transaction_type', 'Transaction Type')
+#         ],
+#         required=False,
+#         widget=forms.CheckboxSelectMultiple
+#     )
+
+# class AddCompanyAndGeneratePDFView(FormView):
+#     template_name = 'unit-list.html' 
+#     form_class = CompanyForm
+#     success_url = reverse_lazy('units') 
+
+#     def form_valid(self, form):
+#         self.request.session['company_name'] = form.cleaned_data['company_name']
+#         self.request.session['company_heading'] = form.cleaned_data['company_heading']
+#         self.request.session['selected_columns'] = form.cleaned_data['selected_columns']
+
+#         if form.cleaned_data['company_image']:
+#             company_image = form.cleaned_data['company_image']
+#             image_path = default_storage.save(company_image.name, company_image)
+#             image_url = default_storage.url(image_path)
+#             self.request.session['company_logo'] = image_url
+
+#         return super().form_valid(form)
+
+#     def get_initial(self):
+#         initial = super().get_initial()
+#         initial['company_name'] = self.request.session.get('company_name', '')
+#         initial['company_heading'] = self.request.session.get('company_heading', '')
+#         initial['selected_columns'] = self.request.session.get('selected_columns', [])
+#         return initial
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['company_name'] = self.request.session.get('company_name', '')
+#         context['company_heading'] = self.request.session.get('company_heading', '')
+#         context['company_logo'] = self.request.session.get('company_logo', '')
+#         context['selected_columns'] = self.request.session.get('selected_columns', [])
+#         return context
+
+
+# from django.views.generic import FormView
+# from django.urls import reverse_lazy
+# from django.core.files.storage import default_storage
+# from django import forms
+
+# class CompanyForm(forms.Form):
+#     company_name = forms.CharField(max_length=255, required=False)
+#     company_heading = forms.CharField(max_length=255, required=False)
+#     company_image = forms.ImageField(required=False)
+#     selected_columns = forms.MultipleChoiceField(
+#         choices=[
+#             ('company_name', 'Company Name'),
+#             ('company_image', 'Company Image'),
+#             ('product_id', 'Product ID'),
+#             ('product_name', 'Product Name'),
+#             ('product_type', 'Product Type'),
+#             ('created_at', 'Created Date'),
+#             ('quantity', 'Quantity'),
+#             ('unit', 'Unit'),
+#             ('transaction_type', 'Transaction Type')
+#         ],
+#         required=False,
+#         widget=forms.CheckboxSelectMultiple
+#     )
+
+# from django.views.generic import FormView
+# from django.urls import reverse_lazy
+# from django.core.files.storage import default_storage
+# from django import forms
+
+# from django import forms
+
+# class CompanyForm(forms.Form):
+#     company_name = forms.CharField(max_length=100)
+#     company_heading = forms.CharField(max_length=100)
+#     company_image = forms.ImageField(required=False)
+
+#     # Define the columns available for selection
+#     COLUMN_CHOICES = [
+#         ('company_name', 'Company Name'),
+#         ('company_image', 'Company Image'),
+#         ('product_id', 'Product ID'),
+#         ('product_name', 'Product Name'),
+#         ('product_type', 'Product Type'),
+#         ('created_at', 'Created At'),
+#         ('quantity', 'Quantity'),
+#         ('unit', 'Unit'),
+#         ('transaction_type', 'Transaction Type'),
+#     ]
+
+#     # Use MultipleChoiceField to allow multiple selections
+#     selected_columns = forms.MultipleChoiceField(
+#         choices=COLUMN_CHOICES,
+#         widget=forms.CheckboxSelectMultiple,
+#         required=False
+#     ) -->
+
+
+
+
+
+
+<!-- 
+# class AddCompanyAndGeneratePDFView(View):
+
+
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')  
+
+#         # Save company details in session
+#         # request.session['company_name'] = company_name
+#         # request.session['company_heading'] = company_heading
+#         # print(company_name)
+#         if company_name:
+#             request.session['company_name'] = company_name
+#         if company_heading:
+#             request.session['company_heading'] = company_heading
+#         print(company_heading)
+
+#         # Process company image if it's selected
+#         if company_logo and 'company_image' in selected_columns:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)
+#             request.session['company_image_url'] = request.build_absolute_uri(uploaded_file_url)
+#         else:
+#             # Fallback to a default image if none is uploaded or not selected
+#             request.session['company_image_url'] = request.build_absolute_uri('/static/img/company_logo.png')
+
+#         # Save the selected columns in session
+#         request.session['selected_columns'] = selected_columns
+
+#         # Redirect to the 'units' page after saving the form
+#         return redirect('units')
+
+# import logging
+
+# logger = logging.getLogger(__name__)
+
+# class AddCompanyAndGeneratePDFView(View):
+
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')
+
+#         # Logging the incoming POST data
+#         logger.info(f"POST data - Company Name: {company_name}, Company Heading: {company_heading}")
+
+#         # Save company details in session
+#         if company_name:
+#             request.session['company_name'] = company_name
+#         else:
+#             logger.warning("No company name provided in POST data.")
+        
+#         if company_heading:
+#             request.session['company_heading'] = company_heading
+#         else:
+#             logger.warning("No company heading provided in POST data.")
+
+#         # Logging session values after setting
+#         logger.info(f"Session - Company Name: {request.session.get('company_name')}")
+#         logger.info(f"Session - Company Heading: {request.session.get('company_heading')}")
+
+#         # Process company image if it's selected
+#         if company_logo and 'company_image' in selected_columns:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)
+#             request.session['company_image_url'] = request.build_absolute_uri(uploaded_file_url)
+#             logger.info(f"Company logo saved at: {uploaded_file_url}")
+#         else:
+#             # Fallback to a default image if none is uploaded or not selected
+#             default_image_url = request.build_absolute_uri('/static/img/company_logo.png')
+#             request.session['company_image_url'] = default_image_url
+#             logger.info(f"No logo uploaded. Using default image: {default_image_url}")
+
+#         # Save the selected columns in session
+#         request.session['selected_columns'] = selected_columns
+
+#         # Redirect to the 'units' page after saving the form
+#         return redirect('units')
+
+#     def get(self, request):
+#         # Logging the current session values when rendering the page
+#         logger.info(f"Session Company Name: {request.session.get('company_name')}")
+#         logger.info(f"Session Company Heading: {request.session.get('company_heading')}")
+#         return render(request, 'template_name.html')  # Change 'template_name.html' to your actual template name
+
+# class AddCompanyAndGeneratePDFView(View):
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')
+
+#         request.session['company_name'] = company_name
+#         request.session['company_heading'] = company_heading
+
+#         if company_logo and 'company_image' in selected_columns:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)
+#             request.session['company_image_url'] = request.build_absolute_uri(uploaded_file_url)
+#         else:
+#             request.session['company_image_url'] = request.build_absolute_uri('/static/img/company_logo.png')
+
+#         request.session['selected_columns'] = selected_columns
+
+#         return redirect('units') 
+
+# from django.shortcuts import render, redirect
+# from django.views import View
+
+# class AddCompanyAndGeneratePDFView(View):
+
+#     def get(self, request):
+#         # Pass 'selected_columns' from session or an empty list if not set
+#         selected_columns = request.session.get('selected_columns', [])
+#         print(selected_columns)
+
+#         context = {
+#             'selected_columns': selected_columns,
+#         }
+#         return render(request, 'unit-list.html', context)
+
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')
+
+#         # Save company details in session
+#         request.session['company_name'] = company_name
+#         request.session['company_heading'] = company_heading
+
+#         # Process company image if selected
+#         if company_logo and 'company_image' in selected_columns:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)
+#             request.session['company_image_url'] = request.build_absolute_uri(uploaded_file_url)
+#         else:
+#             request.session['company_image_url'] = request.build_absolute_uri('/static/img/company_logo.png')
+
+#         # Save the selected columns in session
+#         request.session['selected_columns'] = selected_columns
+#         print(selected_columns)
+
+#         # Redirect to another page or render the same page with the updated session
+#         return redirect('units') -->
+
+
+
+<!-- # class AddCompanyAndGeneratePDFView(View):
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')  # Get the list of selected columns
+
+#         # Debug print to verify selected columns
+#         print("Selected Columns:", selected_columns)
+
+#         # Save company details in session
+#         request.session['company_heading'] = company_heading
+
+#         # Check if company name is selected
+#         if 'company_name' in selected_columns:
+#             request.session['company_name'] = company_name
+
+#         # Check if company logo is uploaded and selected
+#         if company_logo and 'company_image' in selected_columns:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)  # Get the URL for the uploaded file
+#             request.session['company_image_url'] = request.build_absolute_uri(uploaded_file_url)  # Save the absolute URL to session
+#         else:
+#             request.session['company_image_url'] = request.build_absolute_uri('/static/img/company_logo.png')  # Default logo
+
+#         # Save selected columns in session
+#         request.session['selected_columns'] = selected_columns
+
+#         return redirect('units')
+
+# class AddCompanyAndGeneratePDFView(View):
+#     def get(self, request):
+#         # Retrieve stored values from the session, if available
+#         company_name = request.session.get('company_name', '')
+#         company_heading = request.session.get('company_heading', '')
+#         company_image_url = request.session.get('company_image_url', '')
+#         selected_columns = request.session.get('selected_columns', [])
+
+#         context = {
+#             'company_name': company_name,
+#             'company_heading': company_heading,
+#             'company_image_url': company_image_url,
+#             'selected_columns': selected_columns,
+#         }
+
+#         return render(request, 'your_template_name.html', context)
+
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')  # Get the list of selected columns
+
+#         # Save company details in session
+#         request.session['company_name'] = company_name
+#         request.session['company_heading'] = company_heading
+
+#         if company_logo and 'company_image' in selected_columns:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)
+#             request.session['company_image_url'] = request.build_absolute_uri(uploaded_file_url)
+#         else:
+#             request.session['company_image_url'] = request.build_absolute_uri('/static/img/company_logo.png')
+
+#         request.session['selected_columns'] = selected_columns
+
+#         return redirect('units') 
+
+
+
+
+
+hihi
+# class DownloadPDFView(View):
+#     def get(self, request, *args, **kwargs):
+#         selected_columns = request.session.get('selected_columns', [])
+#         search_query = request.GET.get('search_query', '')
+#         selected_product_id = request.GET.get('product_filter')  
+
+#         history_list = ProductHistory.objects.all()
+
+#         if search_query:
+#             if search_query.isdigit():
+#                 history_list = history_list.filter(product__product_id=search_query)  
+#             else:
+#                 history_list = history_list.filter(Q(product__product_name__icontains=search_query))  
+
+#         if selected_product_id:
+#             history_list = history_list.filter(product_id=selected_product_id)
+
+#         # Fetch company information from session
+#         company_name = request.session.get('company_name', 'Your Company')
+#         company_heading = request.session.get('company_heading', 'Product History Report')
+
+#         # Prepare the context for the template
+#         context = {
+#             'company_name': company_name,
+#             'company_heading': company_heading,
+#             'current_date': datetime.now().strftime('%Y-%m-%d'),
+#             'history_list': history_list,
+#             'selected_columns': selected_columns,
+#         }
+
+#         # Render the HTML template to a string
+#         html_string = render_to_string('pdf_template.html', context)
+
+#         # Create a PDF response
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
+
+#         # Convert HTML to PDF
+#         pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+#         # Check for errors
+#         if pisa_status.err:
+#             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
+
+#         return response
+
+# class DownloadPDFView(View):
+#     def get(self, request, *args, **kwargs):
+#         selected_columns = request.session.get('selected_columns', [])
+#         search_query = request.GET.get('search_query', '')
+#         selected_product_id = request.GET.get('product_filter')
+
+#         history_list = ProductHistory.objects.all()
+
+#         if selected_product_id:
+#             history_list = history_list.filter(product_id=selected_product_id)
+
+
+#         # Fetch company information from session
+#         company_name = request.session.get('company_name', 'Your Company')
+#         company_heading = request.session.get('company_heading', 'Product History Report')
+#         company_image_url = request.session.get('company_image_url', None)  # Get image URL from session
+
+#         # Prepare the context for the template
+#         context = {
+#             'company_name': company_name,
+#             'company_heading': company_heading,
+#             'company_image': company_image_url,  # Pass image URL
+#             'current_date': datetime.now().strftime('%Y-%m-%d'),
+#             'history_list': history_list,
+#             'selected_columns': selected_columns,
+#         }
+
+#         # Render the HTML template to a string
+#         html_string = render_to_string('pdf_template.html', context)
+
+#         # Create a PDF response
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
+
+#         # Convert HTML to PDF
+#         pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+#         # Check for errors
+#         if pisa_status.err:
+#             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
+
+#         return response
+
+
+
+
+
+
+
+# from django.shortcuts import render
+# from django.http import HttpResponse
+# from django.template.loader import render_to_string
+# from xhtml2pdf import pisa
+# from datetime import datetime
+
+# class DownloadPDFView(View):
+#     def get(self, request, *args, **kwargs):
+#         selected_columns = request.session.get('selected_columns', [])
+#         search_query = request.GET.get('search_query', '')
+#         selected_product_id = request.GET.get('product_filter')
+
+#         # Start with all product history
+#         history_list = ProductHistory.objects.all()
+
+#         if search_query:
+#             if search_query.isdigit():
+#                 history_list = history_list.filter(product__product_id=search_query)  # Search by product_id
+#             else:
+#                 history_list = history_list.filter(Q(product__product_name__icontains=search_query))  # Search by product_name
+
+#         # Filter by selected product from dropdown if it exists
+#         if selected_product_id:
+#             history_list = history_list.filter(product_id=selected_product_id)
+
+#         # Fetch company information from session
+#         company_name = request.session.get('company_name', 'Your Company')
+#         company_heading = request.session.get('company_heading', 'Product History Report')
+#         company_image = request.session.get('company_image', None)
+
+#         # Check if company name or image should be included in the PDF
+#         include_company_name = 'company_name' in selected_columns
+#         include_company_image = 'company_image' in selected_columns
+
+#         # Prepare the context for the template
+#         context = {
+#             'company_name': company_name if include_company_name else '',
+#             'company_heading': company_heading,
+#             'company_image': company_image if include_company_image else None,
+#             'current_date': datetime.now().strftime('%Y-%m-%d'),
+#             'history_list': history_list,
+#             'selected_columns': selected_columns,
+#         }
+
+#         # Render the HTML template to a string
+#         html_string = render_to_string('pdf_template.html', context)
+
+#         # Create a PDF response
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
+
+#         # Convert HTML to PDF
+#         pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+#         # Check for errors
+#         if pisa_status.err:
+#             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
+
+#         return response
+
+# class DownloadPDFView(View):
+#     def get(self, request, *args, **kwargs):
+#         selected_columns = request.session.get('selected_columns', [])
+#         search_query = request.GET.get('search_query', '')
+#         selected_product_id = request.GET.get('product_filter')
+
+#         # Start with all product history
+#         history_list = ProductHistory.objects.all()
+
+#         # Filter by search query if it exists
+#         if search_query:
+#             if search_query.isdigit():
+#                 history_list = history_list.filter(product__product_id=search_query)  # Search by product_id
+#             else:
+#                 history_list = history_list.filter(Q(product__product_name__icontains=search_query))  # Search by product_name
+
+#         # Filter by selected product from dropdown if it exists
+#         if selected_product_id:
+#             history_list = history_list.filter(product_id=selected_product_id)
+
+#         # Fetch company information from session
+#         company_name = request.session.get('company_name', 'Your Company')
+#         company_heading = request.session.get('company_heading', 'Product History Report')
+#         company_logo_url = request.session.get('company_logo_url', None)
+
+#         # Check if company name or image should be included in the PDF
+#         include_company_name = 'company_name' in selected_columns
+#         include_company_image = 'company_image' in selected_columns
+
+#         # Prepare the context for the template
+#         context = {
+#             'company_name': company_name if include_company_name else '',
+#             'company_heading': company_heading,
+#             'company_image': company_logo_url if include_company_image else None,
+#             'current_date': datetime.now().strftime('%Y-%m-%d'),
+#             'history_list': history_list,
+#             'selected_columns': selected_columns,
+#         }
+
+#         # Render the HTML template to a string
+#         html_string = render_to_string('pdf_template.html', context)
+
+#         # Create a PDF response
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
+
+#         # Convert HTML to PDF
+#         pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+#         # Check for errors
+#         if pisa_status.err:
+#             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
+
+#         return response
+
+# class DownloadPDFView(View):
+#     def get(self, request, *args, **kwargs):
+#         selected_columns = request.session.get('selected_columns', [])
+#         search_query = request.GET.get('search_query', '')
+#         selected_product_id = request.GET.get('product_filter')
+
+#         # Start with all product history
+#         history_list = ProductHistory.objects.all()
+
+#         # Filter by search query if it exists
+#         if search_query:
+#             if search_query.isdigit():
+#                 history_list = history_list.filter(product__product_id=search_query)
+#             else:
+#                 history_list = history_list.filter(Q(product__product_name__icontains=search_query))
+
+#         # Filter by selected product from dropdown if it exists
+#         if selected_product_id:
+#             history_list = history_list.filter(product_id=selected_product_id)
+
+#         # Ensure there's at least one selected column and history data
+#         if not selected_columns or not history_list.exists():
+#             return HttpResponse("No data available for PDF generation.", content_type="text/plain")
+
+#         # Fetch company information from session
+#         company_name = request.session.get('company_name', 'Your Company')
+#         company_heading = request.session.get('company_heading', 'Product History Report')
+#         company_logo_url = request.session.get('company_logo_url', None)
+
+#         # Prepare the context for the template
+#         context = {
+#             'company_name': company_name,
+#             'company_heading': company_heading,
+#             'company_image': company_logo_url,
+#             'current_date': datetime.now().strftime('%Y-%m-%d'),
+#             'history_list': history_list,
+#             'selected_columns': selected_columns,
+#         }
+
+#         # Render the HTML template to a string
+#         html_string = render_to_string('pdf_template.html', context)
+
+#         # Create a PDF response
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
+
+#         # Convert HTML to PDF
+#         pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+#         # Check for errors
+#         if pisa_status.err:
+#             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
+
+#         return response
+
+
+# class DownloadPDFView(View):
+#     def get(self, request, *args, **kwargs):
+#         product_id = request.GET.get('product_id')
+#         selected_columns = request.session.get('selected_columns', [])
+        
+#         # Fetch product history based on product_id
+#         # history_list = ProductHistory.objects.filter(product_id=product_id)
+#         history_list = ProductHistory.objects.all()
+
+
+#         # Fetch company information from session
+#         company_name = request.session.get('company_name', 'Your Company')
+#         company_heading = request.session.get('company_heading', 'Product History Report')
+
+#         # Prepare the context for the template
+#         context = {
+#             'company_name': company_name,
+#             'company_heading': company_heading,
+#             'current_date': datetime.now().strftime('%Y-%m-%d'),
+#             'history_list': history_list,
+#             'selected_columns': selected_columns,
+#         }
+
+#         # Render the HTML template to a string
+#         html_string = render_to_string('pdf_template.html', context)
+
+#         # Create a PDF response
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
+
+#         # Convert HTML to PDF
+#         pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+#         # Check for errors
+#         if pisa_status.err:
+#             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
+
+#         return response
+
+# from django.http import HttpResponse
+# from django.views import View
+# from django.template.loader import render_to_string
+# from xhtml2pdf import pisa
+# from datetime import datetime
+# from .models import ProductHistory  # Ensure you import your model
+
+# class DownloadPDFView(View):
+#     def get(self, request, *args, **kwargs):
+#         product = request.GET.get('product')
+#         print(product)
+
+#         history_list = ProductHistory.objects.all()
+
+#         # Fetch company information from session
+#         company_name = request.session.get('company_name', 'Your Company')
+#         company_heading = request.session.get('company_heading', 'Product History Report')
+
+#         # Prepare the context for the template
+#         context = {
+#             'company_name': company_name,
+#             'company_heading': company_heading,
+#             'current_date': datetime.now().strftime('%Y-%m-%d'),
+#             'history_list': history_list,
+#         }
+
+#         # Render the HTML template to a string
+#         html_string = render_to_string('pdf_template.html', context)
+
+#         # Create a PDF response
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
+
+#         # Convert HTML to PDF
+#         pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+#         # Check for errors
+#         if pisa_status.err:
+#             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
+
+#         return response
+
+
+# class AddCompanyAndGeneratePDFView(View):
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')
+
+#         # Save company details in session
+#         request.session['company_name'] = company_name
+#         request.session['company_heading'] = company_heading
+
+#         # If company logo is uploaded, save it
+#         if company_logo:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)
+#             request.session['company_logo_url'] = uploaded_file_url
+#         else:
+#             request.session['company_logo_url'] = '/static/img/company_logo.png'  # Default logo
+
+#         # Save selected columns in session
+#         selected_columns = request.POST.getlist('columns')
+#         request.session['selected_columns'] = selected_columns
+
+#         # Debug logging to confirm selected columns
+#         logging.debug(f"Selected columns saved: {selected_columns}")
+
+#         return redirect('units')
+
+# class AddCompanyAndGeneratePDFView(View):
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')
+
+#         # Save company details in session
+#         request.session['company_name'] = company_name
+#         request.session['company_heading'] = company_heading
+
+#         # If company logo is uploaded, save it
+#         if company_logo:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)
+#             request.session['company_logo_url'] = request.build_absolute_uri(uploaded_file_url)  # Ensure absolute path
+#         else:
+#             # Use a default logo if none is uploaded
+#             default_logo_path = '/static/img/company_logo.png'
+#             request.session['company_logo_url'] = request.build_absolute_uri(default_logo_path)
+
+#         # Save selected columns in session
+#         request.session['selected_columns'] = selected_columns
+
+#         return redirect('units')
+
+# class AddCompanyAndGeneratePDFView(View):
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')
+#         print(selected_columns)
+#         # Save company details in session
+#         request.session['company_name'] = company_name
+#         request.session['company_heading'] = company_heading
+
+#         # If company logo is uploaded, save it
+#         if company_logo:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)  # This is the correct URL for the image
+#             request.session['company_image_url'] = uploaded_file_url  # Save the URL to session
+#         else:
+#             request.session['company_image_url'] = '/static/img/company_logo.png'  # Default logo
+
+#         # Save selected columns in session
+#         request.session['selected_columns'] = selected_columns
+
+#         return redirect('units')
+
+# class AddCompanyAndGeneratePDFView(View):
+#     def post(self, request):
+#         company_name = request.POST.get('company_name')
+#         company_heading = request.POST.get('company_heading')
+#         company_logo = request.FILES.get('company_image')
+#         selected_columns = request.POST.getlist('selected_columns')  # Get the list of selected columns
+
+#         # Debug print to verify selected columns
+#         print("Selected Columns:", selected_columns)
+
+#         # Save company details in session
+#         request.session['company_name'] = company_name
+#         request.session['company_heading'] = company_heading
+
+#         # If company logo is uploaded, save it and get the URL
+#         if company_logo:
+#             fs = FileSystemStorage()
+#             filename = fs.save(company_logo.name, company_logo)
+#             uploaded_file_url = fs.url(filename)  # Get the URL for the uploaded file
+#             request.session['company_image_url'] = request.build_absolute_uri(uploaded_file_url)  # Save the absolute URL to session
+#         else:
+#             request.session['company_image_url'] = request.build_absolute_uri('/static/img/company_logo.png')  # Default logo
+
+#         # Save selected columns in session
+#         request.session['selected_columns'] = selected_columns
+
+#         return redirect('units')
+
+
+
+
+
+-->
+
+

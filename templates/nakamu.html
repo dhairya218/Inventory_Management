@@ -1,0 +1,494 @@
+        <!-- Add Company Modal -->
+        <!-- <div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog" aria-labelledby="addCompanyLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">Add Company</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'add_company_and_pdf' %}" enctype="multipart/form-data">
+                            {% csrf_token %} -->
+                            <!-- <div class="form-group">
+                                <label for="company_name">Company Name</label>
+                                <input type="text" name="company_name" id="company_name" class="form-control" 
+                                    value="{{ request.session.company_name|default_if_none:'' }}">
+                                <p>Debug Company Name: {{ request.session.company_name }}</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="company_heading">Company Heading</label>
+                                <input type="text" name="company_heading" id="company_heading" class="form-control" 
+                                    value="{{ request.session.company_heading }}">
+                                <p>Debug Company Heading: {{ request.session.company_heading }}</p> 
+                            </div> -->
+                            <!-- <div class="form-group">
+                                <label for="company_name">Company Name</label>
+                                <input type="text" name="company_name" id="company_name" class="form-control" 
+                                       value="{{ request.session.company_name|default_if_none:'' }}" placeholder="{{ request.session.company_name|default_if_none:'' }}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="company_heading">Company Heading</label>
+                                <input type="text" name="company_heading" id="company_heading" class="form-control" 
+                                       value="{{ request.session.company_heading | default_if_none:'' }}" placeholder="{{ request.session.company_heading|default_if_none:'' }}">
+                            </div> -->
+                            
+                            <!--<div class="form-group">
+
+                                 <label for="company_name">Company Name</label>
+                                <input type="text" name="company_name" class="form-control" id="company_name" value="{{ request.session.company_name | default_if_none:'' }}" required> -->
+                                <!-- <label for="company_name">Company Name</label>
+                                <input type="text" name="company_name" id="company_name" class="form-control" value="{{ request.session.company_name|default_if_none:'' }}">
+                            </div>
+                        
+                            <div class="form-group">
+                                <label for="company_heading">Company Heading</label>
+                                <input type="text" name="company_heading" class="form-control" id="company_heading" value="{{ request.session.company_heading|default_if_none:'' }}">
+                            </div> -->
+                        
+                            <!-- <div class="form-group">
+                                <label for="company_image">Upload Company Image</label>
+                                <input type="file" name="company_image" class="form-control-file" id="company_image" value="{{ request.session.company_image|default_if_none:'' }}" placeholder="{{ request.session.company_image|default_if_none:'' }}">
+                            </div>
+
+                            <div class="mt-2">
+                                <img src="{{ request.session.company_logo }}" alt="company logo" style="max-height: 100px;">
+                            </div>
+                        
+                            <div class="form-group">
+                                <label>Select Columns to Include in PDF</label><br>
+                        
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="company_name" id="company_name_checkbox" {% if 'company_name' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="company_name_checkbox">Company Name</label>
+                                </div>
+                        
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="company_image" id="company_image_checkbox" {% if 'company_image' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="company_image_checkbox">Company Image</label>
+                                </div>
+                        
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="product_id" id="product_id" {% if 'product_id' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="product_id">Product ID</label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="product_name" id="product_name" {% if 'product_name' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="product_name">Product Name</label>
+                                </div>
+                        
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="product_type" id="product_type" {% if 'product_type' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="product_type">Product Type</label>
+                                </div>
+                        
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="created_at" id="created_at" {% if 'created_at' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="created_at">Created Date</label>
+                                </div>
+                        
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="quantity" id="quantity" {% if 'quantity' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="quantity">Quantity</label>
+                                </div>
+                        
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="unit" id="unit" {% if 'unit' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="unit">Unit</label>
+                                </div>
+                        
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="transaction_type" id="transaction_type" {% if 'transaction_type' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="transaction_type">Transaction Type</label>
+                                </div>
+                                <p>Debug Selected Columns: {{ request.session.selected_columns }}</p>
+                            </div>
+                        
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- Add Company Modal -->
+
+
+
+
+        <!-- <div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog" aria-labelledby="addCompanyLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">Add Company</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'add_company_and_pdf' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label for="company_name">Company Name</label>
+                                <input type="text" name="company_name" id="company_name" class="form-control"
+                                    value="{{ request.session.company_name|default_if_none:'' }}" placeholder="Enter company name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="company_heading">Company Heading</label>
+                                <input type="text" name="company_heading" id="company_heading" class="form-control"
+                                    value="{{ request.session.company_heading|default_if_none:'' }}" placeholder="Enter company heading">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="company_image">Upload Company Image</label>
+                                <input type="file" name="company_image" class="form-control-file" id="company_image">
+                            </div>
+
+                            <div class="mt-2">
+                                {% if request.session.company_logo %}
+                                    <img src="{{ request.session.company_logo }}" alt="company logo" style="max-height: 100px;">
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label>Select Columns to Include in PDF</label><br>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="company_name" id="company_name_checkbox" 
+                                        {% if 'company_name' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="company_name_checkbox">Company Name</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="company_image" id="company_image_checkbox" 
+                                        {% if 'company_image' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="company_image_checkbox">Company Image</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="product_id" id="product_id_checkbox" 
+                                        {% if 'product_id' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="product_id_checkbox">Product ID</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="product_name" id="product_name_checkbox" 
+                                        {% if 'product_name' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="product_name_checkbox">Product Name</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="product_type" id="product_type_checkbox" 
+                                        {% if 'product_type' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="product_type_checkbox">Product Type</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="created_at" id="created_at_checkbox" 
+                                        {% if 'created_at' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="created_at_checkbox">Created Date</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="quantity" id="quantity_checkbox" 
+                                        {% if 'quantity' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="quantity_checkbox">Quantity</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="unit" id="unit_checkbox" 
+                                        {% if 'unit' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="unit_checkbox">Unit</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_columns" value="transaction_type" id="transaction_type_checkbox" 
+                                        {% if 'transaction_type' in request.session.selected_columns %}checked{% endif %}>
+                                    <label class="form-check-label" for="transaction_type_checkbox">Transaction Type</label>
+                                </div>
+
+                                <p>Debug Selected Columns: {{ request.session.selected_columns }}</p>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- Trigger Button (Make sure this button has the appropriate data attributes) -->
+<!-- Trigger Button -->
+
+
+<!-- Trigger Button -->
+        <!-- Trigger Button -->
+        <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCompanyModal"
+        data-company-name="{{ request.session.company_name|default_if_none:'' }}"
+        data-company-heading="{{ request.session.company_heading|default_if_none:'' }}">
+        Edit Company
+        </button> -->
+
+
+
+
+
+
+
+
+
+
+
+                                
+                        
+                        <!-- <div class="form-group">
+                            <label>Select Columns to Include in PDF</label><br>
+                        
+                            <div id="selected-columns-display" class="mb-3">
+                                <strong>Selected Columns:</strong>
+                                <ul id="selected-columns-list"></ul>
+                            </div>
+                        
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="company_name" id="company_name_checkbox" {% if 'company_name' in request.session.selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="company_name_checkbox">Company Name</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="company_image" id="company_image_checkbox" {% if 'company_image' in selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="company_image_checkbox">Company Image</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="product_id" id="product_id_checkbox" {% if 'product_id' in selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="product_id_checkbox">Product ID</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="product_name" id="product_name_checkbox" {% if 'product_name' in selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="product_name_checkbox">Product Name</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="product_type" id="product_type_checkbox" {% if 'product_type' in selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="product_type_checkbox">Product Type</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="created_at" id="created_at_checkbox" {% if 'created_at' in selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="created_at_checkbox">Created Date</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="quantity" id="quantity_checkbox" {% if 'quantity' in selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="quantity_checkbox">Quantity</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="unit" id="unit_checkbox" {% if 'unit' in selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="unit_checkbox">Unit</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selected_columns" value="transaction_type" id="transaction_type_checkbox" {% if 'transaction_type' in selected_columns %}checked{% endif %}>
+                                <label class="form-check-label" for="transaction_type_checkbox">Transaction Type</label>
+                            </div>
+                        </div> -->
+
+
+
+
+
+
+
+
+
+
+<!-- {% extends 'base.html' %}
+{% block content %}
+    <style>
+        .selected-columns-list {
+            margin-top: 10px;
+        }
+
+        .selected-columns-list .tag {
+            display: inline-block;
+            background-color: #007bff; 
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .selected-columns-list .tag:hover {
+            background-color: #0056b3; 
+        }
+    </style>
+    <div class="container mt-4">
+        <h1>Units List</h1>
+    
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Unit Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for unit in units %}
+                <tr>
+                    <td>{{ unit.id }}</td>
+                    <td>{{ unit.unit_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addUnitModal">Add Unit</button>
+    
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCompanyModal"
+        data-company-name="{{ request.session.company_name|default_if_none:'' }}"
+        data-company-heading="{{ request.session.company_heading|default_if_none:'' }}">
+            Edit Company
+        </button>
+
+
+        <div class="modal fade" id="addUnitModal" tabindex="-1" role="dialog" aria-labelledby="addUnitLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addUnitLabel">Add Unit</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'units' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="unit_name">Unit Name</label>
+                                <input type="text" name="unit_name" class="form-control" id="unit_name" value="{{ unit_name }}" required>
+                            </div>
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#addUnitModal">Add Unit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog" aria-labelledby="addCompanyLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCompanyLabel">Add Company</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'add_company_and_pdf' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="company_name">Company Name</label>
+                            <input type="text" name="company_name" id="company_name" class="form-control" placeholder="Enter company name" 
+                                value="{{ request.session.company_name|default_if_none:'' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="company_heading">Company Heading</label>
+                            <input type="text" name="company_heading" id="company_heading" class="form-control" placeholder="Enter company heading" 
+                                value="{{ request.session.company_heading|default_if_none:'' }}">
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label for="company_image">Upload Company Image</label>
+                            <input type="file" name="company_image" class="form-control-file" id="company_image">
+                        </div>
+
+                        <div class="mt-2">
+                            {% if request.session.company_logo %}
+                                <img src="{{ request.session.company_logo }}" alt="company logo" style="max-height: 100px;">
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="selected_columns">Select Columns to Include in PDF</label>
+                            <select id="selected_columns" name="selected_columns" class="form-control" multiple>
+                                <option value="company_name">Company Name</option>
+                                <option value="company_image">Company Image</option>
+                                <option value="product_id">Product ID</option>
+                                <option value="product_name">Product Name</option>
+                                <option value="product_type">Product Type</option>
+                                <option value="created_at">Created Date</option>
+                                <option value="quantity">Quantity</option>
+                                <option value="unit">Unit</option>
+                                <option value="transaction_type">Transaction Type</option>
+                            </select>
+                        </div>
+                        
+                        <div id="selected_columns_list" class="selected-columns-list"></div>
+                        
+                        
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function() {
+    $('#addCompanyModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); 
+
+        var selectedColumns = button.data('selected-columns');
+        if (selectedColumns) {
+            selectedColumns = selectedColumns.split(','); 
+
+            $('#selected_columns option').prop('selected', false);
+
+            selectedColumns.forEach(function(column) {
+                $('#selected_columns option[value="' + column + '"]').prop('selected', true);
+            });
+
+            updateSelectedColumnsDisplay();
+        }
+    });
+
+    function updateSelectedColumnsDisplay() {
+        var selectedOptions = Array.from(document.getElementById('selected_columns').selectedOptions).map(option => option.text);
+        var selectedColumnsList = document.getElementById('selected_columns_list');
+        
+        selectedColumnsList.innerHTML = '';
+
+        selectedOptions.forEach(function(column) {
+            var span = document.createElement('span');
+            span.classList.add('tag');
+            span.textContent = column;
+            selectedColumnsList.appendChild(span);
+        });
+    }
+
+    document.getElementById('selected_columns').addEventListener('change', updateSelectedColumnsDisplay);
+
+    $('#saveSelections').on('click', function() {
+        var selectedColumns = Array.from(document.getElementById('selected_columns').selectedOptions).map(option => option.value);
+
+        var triggerButton = $('[data-toggle="modal"][data-target="#addCompanyModal"]');
+        triggerButton.data('selected-columns', selectedColumns.join(','));
+
+        $('#addCompanyModal').modal('hide');
+    });
+
+    updateSelectedColumnsDisplay();
+});
+
+
+
+    </script>
+
+
+{% endblock %}
+    
+ -->

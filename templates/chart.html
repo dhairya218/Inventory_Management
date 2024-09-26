@@ -1,0 +1,85 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Daily Addition</title>
+    <link rel="stylesheet" href="{% static 'css/style9.css' %}">
+    <style>
+        .chart-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+        }
+        .bar {
+            width: 40px;
+            display: inline-block;
+            background-color: #4CAF50;
+            margin: 0 5px;
+            vertical-align: bottom;
+            height: 0; /* Set height dynamically */
+        }
+        .x-axis {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .x-axis li {
+            width: 40px;
+            text-align: center;
+            margin: 0 2px;
+        }
+        .meter {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            position: absolute;
+            left: -50px;
+            top: 0;
+        }
+        .meter li {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Daily Addition Bar Graph</h1>
+    <div class="chart-container">
+        <!-- Y-axis Meter (Product Counts with a gap of 5) -->
+        <ul class="meter">
+            {% for i in "543210"|make_list %}
+            <li>{{ i|add:5|add:5 }}</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Bars for each day -->
+        <div id="bars">
+            {% for quantity in quantities %}
+            <div class="bar" style="height: {{ quantity|default:0 }}px;"></div>
+            {% endfor %}
+        </div>
+
+        <!-- X-axis Labels (Dates) -->
+        <ul class="x-axis" id="x-axis">
+            {% for date in dates %}
+            <li>{{ date }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
