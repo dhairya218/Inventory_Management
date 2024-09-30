@@ -193,3 +193,35 @@ class CompanyForm(forms.Form):
         required=False,
         widget=forms.CheckboxSelectMultiple
     )
+
+
+# forms.py
+
+# from django import forms
+# from django.contrib.auth.models import User
+
+# class PasswordResetForm(forms.Form):
+#     email = forms.EmailField(label="Email", max_length=254)
+
+#     def clean_email(self):
+#         email = self.cleaned_data['email']
+#         if not User.objects.filter(email=email).exists():
+#             raise forms.ValidationError("This email address is not registered.")
+#         return email
+
+
+# forms.py
+
+from django import forms
+from django.contrib.auth import get_user_model
+
+CustomUser = get_user_model()
+
+class PasswordResetForm(forms.Form):
+    email = forms.EmailField(max_length=254)
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError("No user is associated with this email address.")
+        return email

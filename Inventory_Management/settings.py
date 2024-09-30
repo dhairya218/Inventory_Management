@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'inventory.CustomUser'
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -137,3 +138,10 @@ STATICFILES_DIRS = (
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'dkdhuri67@gmail.com'
+EMAIL_HOST_PASSWORD = 'wrzu ernr orku itmi'
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'

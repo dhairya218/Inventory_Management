@@ -1,7 +1,10 @@
 from django.urls import path
-from .views import (Index,Chart,daily_additions,DownloadPDFView,AddCompanyAndGeneratePDFView, DeactivateProductView,ActivateProductView,ToggleProductStatusView, UnitView,  TodayTransactionsView, DashboardView,ProductListBulkDeleteView, LoginView, Add_User, LogoutView, SettingsView, EditHistoryQuantityView, ChangePasswordView, ProductListView, ProfileView, AddProductView, RecentBuyView, RecentSellView, ProductStockView, ProductHistoryView,    EditQuantityView, ReturnQuantityView)
+from .views import (Index,Chart,daily_additions
+,DownloadPDFView,AddCompanyAndGeneratePDFView,CustomPasswordResetView ,DeactivateProductView,ActivateProductView,ToggleProductStatusView, UnitView,  TodayTransactionsView, DashboardView,ProductListBulkDeleteView, LoginView, Add_User, LogoutView, SettingsView, EditHistoryQuantityView, ChangePasswordView, ProductListView, ProfileView, AddProductView, RecentBuyView, RecentSellView, ProductStockView, ProductHistoryView,    EditQuantityView, ReturnQuantityView)
 # ProductHistoryEditView,DailyAdditionsView,UnitView,UnitCreateView,YourView
 from . import views
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     path('', Index.as_view(), name='index'),
@@ -35,5 +38,14 @@ urlpatterns = [
     path('download-pdf/', DownloadPDFView.as_view(), name='download-pdf'),
     path('add_company_and_pdf/', AddCompanyAndGeneratePDFView.as_view(), name='add_company_and_pdf'),
     # path('save-columns/', YourView.as_view(), name='save_columns')
+    # path('password_reset/', PasswordResetRequestView.as_view(), name='password_reset'),
+    # path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
+    # path('password_reset_confirm/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    # path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
+        path('password_reset/', CustomPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset_confirm/<uidb64>/<token>/', CustomPasswordResetView.as_view(), name='password_reset_confirm'),
 
+    # Keep these views for password reset done and complete
+    path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
+    path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
 ]

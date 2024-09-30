@@ -35,6 +35,27 @@ from django.urls import reverse_lazy
 from django.core.files.storage import default_storage
 from django import forms
 from django.views.generic.edit import FormView
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth import get_user_model
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.views import View
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth import get_user_model
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.urls import reverse_lazy
 
 
 class UnitView(View):
@@ -186,49 +207,6 @@ class ProductListView(View):
             'total_products': total_products
         })
 
-    # def post(self, request):
-    #     if 'action' in request.POST and request.POST['action'] == 'delete':
-    #         product_ids = request.POST.getlist('product_ids')
-    #         ProductList.objects.filter(id__in=product_ids).delete()
-    #         return redirect('product-list')
-
-    #     form = ProductForm(request.POST)
-    #     if form.is_valid():
-    #         product = form.save()
-    #         quantity = form.cleaned_data['initial_quantity']
-
-    #         stock, created = ProductStock.objects.get_or_create(product=product)
-    #         if not created:
-    #             stock.stock_quantity += quantity
-    #             stock.save()
-    #         else:
-    #             stock.stock_quantity = quantity
-    #             stock.save()
-
-    #         ProductHistory.objects.create(
-    #             product=product,
-    #             transaction_type='buy',
-    #             quantity=quantity
-    #         )
-
-    #         return redirect('product-list')
-
-    #     product_list = ProductList.objects.all()
-    #     units = Unit.objects.all()  
-    #     paginator = Paginator(product_list, 10)
-    #     page_number = request.GET.get('page')
-    #     page_obj = paginator.get_page(page_number)
-
-    #     total_products = product_list.count()
-
-    #     return render(request, 'product-list.html', {
-    #         'form': form,
-    #         'units': units,  
-    #         'page_obj': page_obj,
-    #         'modal_open': True,
-    #         'total_products': total_products
-    #     })
-
     def post(self, request):
         if 'action' in request.POST and request.POST['action'] == 'delete':
             product_ids = request.POST.getlist('product_ids')
@@ -265,9 +243,8 @@ class ProductListView(View):
                 'form': form,
                 'units': Unit.objects.all(),
                 'page_obj': page_obj,
-                'modal_open': True  # This will keep the modal open if there are errors
+                'modal_open': True  
             })
-
 
 
 class DeactivateProductView(View):
@@ -298,7 +275,6 @@ class ActivateProductView(View):
 
 class ToggleProductStatusView(View):
     def post(self, request, product_id):
-        # Fetch the product by ID
         product = get_object_or_404(ProductList, id=product_id)
 
         product.is_active = not product.is_active
@@ -933,38 +909,6 @@ class AddCompanyAndGeneratePDFView(FormView):
         return context
 
 
-# class DownloadPDFView(View):
-#     def get(self, request, *args, **kwargs):
-#         history_list = ProductHistory.objects.all()
-#         selected_columns = request.session.get('selected_columns', [])
-
-#         company_name = request.session.get('company_name', 'Your Company')
-#         company_heading = request.session.get('company_heading', 'Product History Report')
-#         company_image = request.session.get('company_logo', None)
-
-#         context = {
-#             'company_name': company_name,
-#             'company_heading': company_heading,
-#             'company_image': company_image,
-#             'current_date': datetime.now().strftime('%Y-%m-%d'),
-#             'history_list': history_list,
-#             'selected_columns': selected_columns, 
-#         }
-
-#         html_string = render_to_string('pdf_template.html', context)
-
-#         response = HttpResponse(content_type='application/pdf')
-#         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
-
-#         pisa_status = pisa.CreatePDF(html_string, dest=response)
-
-#         if pisa_status.err:
-#             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
-
-#         return response
-
-
-
 from django.shortcuts import render
 from django.http import HttpResponse
 from datetime import datetime
@@ -975,24 +919,19 @@ from django.template.loader import render_to_string
 
 class DownloadPDFView(View):
     def get(self, request, *args, **kwargs):
-        # Capture the selected product ID from the request (from query params or session)
         selected_product_id = request.GET.get('product_filter', None)
 
-        # Fetch product history, filtered by the selected product if one is chosen
         if selected_product_id:
             history_list = ProductHistory.objects.filter(product_id=selected_product_id)
         else:
             history_list = ProductHistory.objects.all()
 
-        # Fetch the selected columns from session, or provide defaults
         selected_columns = request.session.get('selected_columns', [])
 
-        # Fetch company details from session or use defaults
         company_name = request.session.get('company_name', 'Your Company')
         company_heading = request.session.get('company_heading', 'Product History Report')
         company_image = request.session.get('company_logo', None)
 
-        # Prepare the context for rendering the PDF
         context = {
             'company_name': company_name,
             'company_heading': company_heading,
@@ -1002,17 +941,115 @@ class DownloadPDFView(View):
             'selected_columns': selected_columns,  # These are the columns user selected
         }
 
-        # Render the HTML string for PDF
         html_string = render_to_string('pdf_template.html', context)
 
-        # Generate the PDF
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename=product_history.pdf'
 
         pisa_status = pisa.CreatePDF(html_string, dest=response)
 
-        # Handle PDF generation errors
         if pisa_status.err:
             return HttpResponse('We had some errors <pre>' + html_string + '</pre>')
 
         return response
+
+
+# class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+#     template_name = 'password_reset_confirm.html'
+#     success_url = reverse_lazy('password_reset_complete')
+
+
+# User = get_user_model()
+
+
+# class PasswordResetRequestView(View):
+#     def get(self, request):
+#         return render(request, 'password_reset_request.html')  
+
+#     def post(self, request):
+#         email = request.POST.get('email')
+#         try:
+#             user = User.objects.get(email=email)
+#             token = default_token_generator.make_token(user)
+#             uid = urlsafe_base64_encode(force_bytes(user.pk))
+#             domain = get_current_site(request).domain
+            
+#             mail_subject = 'Password Reset Request'
+#             message = render_to_string('password_reset_email.html', {
+#                 'user': user,
+#                 'domain': domain,
+#                 'uid': uid,
+#                 'token': token,
+#             })
+#             send_mail(mail_subject, message, 'webmaster@localhost', [email])
+            
+#             return redirect('password_reset_done')
+#         except User.DoesNotExist:
+#             return render(request, 'password_reset_request.html', {'error': 'Email does not exist'})
+
+
+from django.views import View
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.contrib.auth.forms import SetPasswordForm
+from django.http import HttpResponse
+
+User = get_user_model()
+
+
+class CustomPasswordResetView(View):
+    def get(self, request, uidb64=None, token=None):
+        if uidb64 and token:
+            try:
+                uid = force_str(urlsafe_base64_decode(uidb64))
+                user = User.objects.get(pk=uid)
+                if default_token_generator.check_token(user, token):
+                    form = SetPasswordForm(user)
+                    return render(request, 'password_reset_confirm.html', {'form': form, 'uidb64': uidb64, 'token': token})
+                else:
+                    return HttpResponse('Invalid password reset link.', status=400)
+            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+                return HttpResponse('Invalid password reset link.', status=400)
+        else:
+            return render(request, 'password_reset_request.html')
+
+    def post(self, request, uidb64=None, token=None):
+        if uidb64 and token:
+            try:
+                uid = force_str(urlsafe_base64_decode(uidb64))
+                user = User.objects.get(pk=uid)
+                form = SetPasswordForm(user, request.POST)
+                if form.is_valid():
+                    form.save()
+                    return redirect(reverse_lazy('password_reset_complete'))
+                else:
+                    return render(request, 'password_reset_confirm.html', {'form': form, 'uidb64': uidb64, 'token': token})
+            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+                return HttpResponse('Invalid password reset link.', status=400)
+        else:
+            email = request.POST.get('email')
+            try:
+                user = User.objects.get(email=email)
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                domain = get_current_site(request).domain
+
+                mail_subject = 'Password Reset Request'
+                message = render_to_string('password_reset_email.html', {
+                    'user': user,
+                    'domain': domain,
+                    'uid': uid,
+                    'token': token,
+                })
+                send_mail(mail_subject, message, 'webmaster@localhost', [email])
+
+                return redirect('password_reset_done')
+            except User.DoesNotExist:
+                return render(request, 'password_reset_request.html', {'error': 'Email does not exist'})
